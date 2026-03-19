@@ -3,58 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wu Yao-Lin's Profile</title>
+    <title>Wu Yao-Lin's Profile - Craft Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #4a90e2;
-            --bg-color: #f4f7f6;
-            --card-bg: #ffffff;
-            --text-color: #333;
+            /* Minecraft 風格配色 */
+            --mc-dirt: #8B5A2B;
+            --mc-grass: #5DAA44;
+            --mc-stone: #787878;
+            --mc-text-dark: #333;
+            --mc-text-light: #fff;
+            --mc-ui-bg: #C6C6C6;
+            --mc-ui-border-light: #FFF;
+            --mc-ui-border-dark: #555;
         }
 
         body {
-            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            font-family: Arial, sans-serif; /* 預設字體 */
+            background-color: #222; /* 深色背景凸顯卡片 */
+            color: var(--mc-text-dark);
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
+            overflow-x: hidden;
+        }
+
+        /* 標題使用像素風字體 */
+        h1, .pixel-font {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.2rem;
+            line-height: 1.5;
+            text-shadow: 2px 2px 0 #000;
+            color: var(--mc-text-light);
         }
 
         .card {
-            background: var(--card-bg);
-            padding: 2rem;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            max-width: 400px;
+            background-color: var(--mc-ui-bg);
+            padding: 1rem;
+            border-radius: 4px; /* Minecraft 介面通常是直角的，稍微圓角即可 */
+            border: 4px solid var(--mc-ui-border-dark);
+            border-top-color: var(--mc-ui-border-light);
+            border-left-color: var(--mc-ui-border-light);
+            box-shadow: 5px 5px 0 rgba(0,0,0,0.5);
+            max-width: 450px;
             width: 90%;
             text-align: center;
+            position: relative;
+            z-index: 10;
         }
 
-        .profile-pic {
-            width: 120px;
-            height: 120px;
-            background-color: #ddd;
-            border-radius: 50%;
-            margin: 0 auto 1.5rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 50px;
+        /* 將內容包起來 */
+        .card-content {
+            background: rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            border: 2px solid var(--mc-ui-border-dark);
+            border-bottom-color: var(--mc-ui-border-light);
+            border-right-color: var(--mc-ui-border-light);
         }
 
-        h1 {
-            margin: 0;
-            color: var(--primary-color);
-            font-size: 1.8rem;
+        .profile-header {
+            background: linear-gradient(to bottom, var(--mc-grass) 50%, var(--mc-dirt) 50%);
+            border: 4px solid #333;
+            padding: 10px;
+            margin-bottom: 1.5rem;
         }
 
         .japanese-name {
-            font-size: 0.9rem;
-            color: #888;
-            margin-bottom: 1.5rem;
+            font-size: 0.8rem;
+            color: #ddd;
+            margin-top: 5px;
+            display: block;
         }
 
         .info-section {
@@ -64,67 +85,222 @@
 
         .info-item {
             margin-bottom: 15px;
-            border-bottom: 1px solid #eee;
+            border-bottom: 2px solid rgba(0,0,0,0.2);
             padding-bottom: 10px;
         }
 
         .label {
             font-weight: bold;
-            color: var(--primary-color);
+            color: var(--mc-dirt);
             display: block;
             font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .content {
             font-size: 1.1rem;
             margin-top: 5px;
             display: block;
+            color: #111;
         }
 
         .lang-jp {
             font-size: 0.8rem;
-            color: #666;
+            color: #555;
             font-style: italic;
         }
 
-        footer {
-            margin-top: 20px;
+        /* 挖礦區域提示 */
+        #mine-zone-hint {
+            margin-top: 25px;
+            padding: 10px;
+            background-color: var(--mc-stone);
+            color: white;
+            border: 3px solid #333;
             font-size: 0.8rem;
-            color: #aaa;
+            cursor: pointer;
+            user-select: none; /* 防止文字被選取 */
         }
+
+        #mine-zone-hint:active {
+            transform: translate(1px, 1px);
+        }
+
+        footer {
+            margin-top: 25px;
+            font-size: 0.8rem;
+            color: #666;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.6rem;
+        }
+
+        /* --- 碎裂特效 CSS --- */
+        .crack-particle {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            background-color: var(--mc-dirt); /* 預設碎片顏色 */
+            border: 2px solid rgba(0,0,0,0.3);
+            pointer-events: none; /* 碎片不能擋住滑鼠事件 */
+            z-index: 100;
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* 動畫：碎片飛散並變小 */
+        @keyframes crack-explode {
+            0% {
+                transform: translate(0, 0) scale(1) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--dx), var(--dy)) scale(0) rotate(var(--dr));
+                opacity: 0;
+            }
+        }
+
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <div class="profile-pic">👋</div>
-        
-        <h1>吳耀林</h1>
-        <div class="japanese-name">ゴ・ヨウリン (Go Yorin)</div>
-
-        <div class="info-section">
-            <div class="info-item">
-                <span class="label">🎂 生日 / 誕生日</span>
-                <span class="content">2008 / 10 / 23</span>
+    <div class="card" id="profile-card">
+        <div class="card-content">
+            <div class="profile-header">
+                <h1>吳耀林</h1>
+                <span class="japanese-name">ゴ・ヨウリン (Go Yorin)</span>
             </div>
 
-            <div class="info-item">
-                <span class="label">🎮 休閒愛好 / 趣味</span>
-                <span class="content">玩 Minecraft <br>
-                <span class="lang-jp">マインクラフトをすること</span></span>
+            <div class="info-section">
+                <div class="info-item">
+                    <span class="label">🎂 BIRTHDAY / 誕生日</span>
+                    <span class="content">2008 / 10 / 23</span>
+                </div>
+
+                <div class="info-item">
+                    <span class="label">🎮 HOBBY / 趣味</span>
+                    <span class="content">玩 Minecraft <br>
+                    <span class="lang-jp">マインクラフトをすること</span></span>
+                </div>
+
+                <div class="info-item">
+                    <span class="label">🍕 FOODS / 好きな食べ物</span>
+                    <span class="content">不挑食，什麼都喜歡！<br>
+                    <span class="lang-jp">好き嫌いはありません。何でも好きです！</span></span>
+                </div>
             </div>
 
-            <div class="info-item">
-                <span class="label">🍕 喜愛的食物 / 好きな食べ物</span>
-                <span class="content">我不挑食，什麼都喜歡！<br>
-                <span class="lang-jp">好き嫌いはありません。何でも好きです！</span></span>
+            <div id="mine-zone-hint" class="pixel-font">
+                HINT: LONG PRESS TO MINE!<br>
+                (長按卡片來挖礦！)
             </div>
+
+            <footer>
+                Nice to meet you!<br>
+                よろしくお願いします！
+            </footer>
         </div>
-
-        <footer>
-            Nice to meet you! / よろしくお願いします！
-        </footer>
     </div>
 
+    <script>
+        // 獲取卡片元素
+        const card = document.getElementById('profile-card');
+        let mineInterval; // 用於儲存長按時的定時器
+        let isMining = false;
+
+        // 方塊碎裂的顏色池 (泥土, 草地, 岩石)
+        const blockColors = ['#8B5A2B', '#5DAA44', '#787878', '#A9A9A9', '#4A3119'];
+
+        // 處理開始挖掘（滑鼠按下或手指觸摸）
+        function startMining(e) {
+            if (isMining) return;
+            isMining = true;
+
+            // 獲取點擊位置（相對於視窗）
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+            // 立即產生一次爆炸
+            createExplosion(clientX, clientY);
+
+            // 設置定時器，長按時持續產生碎片
+            mineInterval = setInterval(() => {
+                createExplosion(clientX, clientY);
+            }, 150); // 每 150 毫秒產生一次
+        }
+
+        // 處理停止挖掘
+        function stopMining() {
+            isMining = false;
+            clearInterval(mineInterval);
+        }
+
+        // 建立單個碎片
+        function createParticle(x, y, color) {
+            const particle = document.createElement('div');
+            particle.classList.add('crack-particle');
+            
+            // 隨機設置碎片顏色
+            particle.style.backgroundColor = color;
+
+            // 設置初始位置（相對於 body）
+            particle.style.left = `${x - 7}px`; // 減去碎片寬度的一半
+            particle.style.top = `${y - 7}px`;
+
+            // 計算隨機飛散方向和旋轉
+            const dx = (Math.random() - 0.5) * 200; // 水平偏移 (-100 to 100)
+            const dy = (Math.random() - 0.5) * 200; // 垂直偏移
+            const dr = (Math.random() - 0.5) * 720; // 旋轉角度
+
+            // 將 CSS 變數傳遞給動畫
+            particle.style.setProperty('--dx', `${dx}px`);
+            particle.style.setProperty('--dy', `${dy}px`);
+            particle.style.setProperty('--dr', `${dr}deg`);
+
+            // 套用動畫
+            particle.style.animation = 'crack-explode 0.6s ease-out forwards';
+
+            document.body.appendChild(particle);
+
+            // 動畫結束後移除元素
+            particle.addEventListener('animationend', () => {
+                particle.remove();
+            });
+        }
+
+        // 建立一次碎片爆炸（多個碎片）
+        function createExplosion(x, y) {
+            const particleCount = 6 + Math.floor(Math.random() * 5); // 隨機產生 6-10 個碎片
+            const color = blockColors[Math.floor(Math.random() * blockColors.length)];
+
+            for (let i = 0; i < particleCount; i++) {
+                // 讓碎片在點擊點附近有些微偏移
+                const offsetX = (Math.random() - 0.5) * 20;
+                const offsetY = (Math.random() - 0.5) * 20;
+                createParticle(x + offsetX, y + offsetY, color);
+            }
+        }
+
+        // --- 事件監聽器 ---
+
+        // 滑鼠事件 (電腦端)
+        card.addEventListener('mousedown', startMining);
+        window.addEventListener('mouseup', stopMining); // 在視窗任何地方放開都停止
+
+        // 觸摸事件 (手機端)
+        card.addEventListener('touchstart', (e) => {
+            // 防止觸摸時捲動頁面
+            if (e.target.id === 'mine-zone-hint' || e.target.closest('#mine-zone-hint')) {
+                 // 如果點擊的是提示區，讓它保持預設行為（例如點擊效果）
+            } else {
+                e.preventDefault(); 
+            }
+            startMining(e);
+        }, { passive: false });
+        
+        window.addEventListener('touchend', stopMining);
+        window.addEventListener('touchcancel', stopMining); // 觸摸被系統中斷時也停止
+
+    </script>
 </body>
 </html>
