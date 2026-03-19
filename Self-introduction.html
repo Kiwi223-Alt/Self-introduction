@@ -3,303 +3,244 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wu Yao-Lin's Profile - Craft Edition</title>
+    <title>Wu Yao-Lin's Profile - Mine & Craft!</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* Minecraft 風格配色 */
+            --mc-text-light: #fff;
             --mc-dirt: #8B5A2B;
             --mc-grass: #5DAA44;
             --mc-stone: #787878;
-            --mc-text-dark: #333;
-            --mc-text-light: #fff;
-            --mc-ui-bg: #C6C6C6;
-            --mc-ui-border-light: #FFF;
-            --mc-ui-border-dark: #555;
         }
 
+        /* 隱藏預設游標 */
         body {
-            font-family: Arial, sans-serif; /* 預設字體 */
-            background-color: #222; /* 深色背景凸顯卡片 */
-            color: var(--mc-text-dark);
+            font-family: Arial, sans-serif;
+            background-color: #222; /* 為了凸顯碎裂特效，使用深色背景 */
+            color: #333;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            overflow-x: hidden;
+            overflow: hidden; /* 防止碎片產生捲軸 */
+            cursor: none; /* 隱藏原本的滑鼠游標 */
         }
 
-        /* 標題使用像素風字體 */
-        h1, .pixel-font {
-            font-family: 'Press Start 2P', cursive;
-            font-size: 1.2rem;
-            line-height: 1.5;
-            text-shadow: 2px 2px 0 #000;
-            color: var(--mc-text-light);
-        }
-
+        /* --- 原本的自我介紹卡片 --- */
         .card {
-            background-color: var(--mc-ui-bg);
-            padding: 1rem;
-            border-radius: 4px; /* Minecraft 介面通常是直角的，稍微圓角即可 */
-            border: 4px solid var(--mc-ui-border-dark);
-            border-top-color: var(--mc-ui-border-light);
-            border-left-color: var(--mc-ui-border-light);
-            box-shadow: 5px 5px 0 rgba(0,0,0,0.5);
-            max-width: 450px;
+            background: #fff;
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            max-width: 400px;
             width: 90%;
             text-align: center;
             position: relative;
             z-index: 10;
+            user-select: none;
+            /* 卡片本身需要顯示游標，否則無法點擊 */
+            cursor: auto; 
         }
 
-        /* 將內容包起來 */
-        .card-content {
-            background: rgba(0,0,0,0.1);
-            padding: 1.5rem;
-            border: 2px solid var(--mc-ui-border-dark);
-            border-bottom-color: var(--mc-ui-border-light);
-            border-right-color: var(--mc-ui-border-light);
+        .profile-pic {
+            width: 120px;
+            height: 120px;
+            background-color: #ddd;
+            border-radius: 50%;
+            margin: 0 auto 1.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 50px;
         }
 
-        .profile-header {
-            background: linear-gradient(to bottom, var(--mc-grass) 50%, var(--mc-dirt) 50%);
-            border: 4px solid #333;
-            padding: 10px;
-            margin-bottom: 1.5rem;
+        h1 {
+            margin: 0;
+            color: #4a90e2;
+            font-size: 1.8rem;
         }
 
         .japanese-name {
-            font-size: 0.8rem;
-            color: #ddd;
-            margin-top: 5px;
-            display: block;
-        }
-
-        .info-section {
-            text-align: left;
-            margin-top: 20px;
-        }
-
-        .info-item {
-            margin-bottom: 15px;
-            border-bottom: 2px solid rgba(0,0,0,0.2);
-            padding-bottom: 10px;
-        }
-
-        .label {
-            font-weight: bold;
-            color: var(--mc-dirt);
-            display: block;
             font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            color: #888;
+            margin-bottom: 1.5rem;
         }
 
-        .content {
-            font-size: 1.1rem;
-            margin-top: 5px;
-            display: block;
-            color: #111;
-        }
+        .info-section { text-align: left; margin-top: 20px; }
+        .info-item { margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .label { font-weight: bold; color: #4a90e2; display: block; font-size: 0.9rem; }
+        .content { font-size: 1.1rem; margin-top: 5px; display: block; }
+        .lang-jp { font-size: 0.8rem; color: #666; font-style: italic; }
 
-        .lang-jp {
-            font-size: 0.8rem;
-            color: #555;
-            font-style: italic;
-        }
-
-        /* 挖礦區域提示 */
-        #mine-zone-hint {
+        .hint {
             margin-top: 25px;
-            padding: 10px;
-            background-color: var(--mc-stone);
-            color: white;
-            border: 3px solid #333;
-            font-size: 0.8rem;
-            cursor: pointer;
-            user-select: none; /* 防止文字被選取 */
-        }
-
-        #mine-zone-hint:active {
-            transform: translate(1px, 1px);
-        }
-
-        footer {
-            margin-top: 25px;
-            font-size: 0.8rem;
-            color: #666;
             font-family: 'Press Start 2P', cursive;
-            font-size: 0.6rem;
+            font-size: 0.65rem;
+            color: var(--mc-text-light);
+            text-shadow: 2px 2px 0 #000;
+            line-height: 1.6;
+        }
+
+        /* --- Minecraft 互動層 --- */
+        #game-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* 讓點擊穿透到卡片 */
+            z-index: 20; /* 在卡片上方 */
+        }
+
+        /* 史蒂夫的手 (自製像素風) */
+        #steve-arm {
+            position: absolute;
+            width: 70px;
+            height: 180px;
+            background-color: #A97D5D; /* 皮膚色 */
+            border: 5px solid #000;
+            border-bottom: none;
+            bottom: -50px;
+            left: 50%;
+            transform: translateX(-50%) rotate(0deg);
+            transform-origin: bottom center;
+            transition: transform 0.05s linear;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding-top: 10px;
+            box-sizing: border-box;
+            box-shadow: 5px 0 0 rgba(0,0,0,0.2);
+        }
+        
+        /* 手上的像素裝飾 */
+        #steve-arm::after {
+            content: '';
+            position: absolute;
+            width: 40px;
+            height: 10px;
+            background: rgba(0,0,0,0.1);
+            top: 60px;
+        }
+
+        /* 手揮動時的動畫 */
+        @keyframes swing {
+            0% { transform: translateX(-50%) rotate(0deg); }
+            50% { transform: translateX(-50%) rotate(-35deg); }
+            100% { transform: translateX(-50%) rotate(0deg); }
+        }
+
+        .swinging {
+            animation: swing 0.1s linear;
         }
 
         /* --- 碎裂特效 CSS --- */
-        .crack-particle {
+        .particle {
             position: absolute;
-            width: 15px;
-            height: 15px;
-            background-color: var(--mc-dirt); /* 預設碎片顏色 */
-            border: 2px solid rgba(0,0,0,0.3);
-            pointer-events: none; /* 碎片不能擋住滑鼠事件 */
+            width: 12px;
+            height: 12px;
+            pointer-events: none;
             z-index: 100;
-            opacity: 1;
-            transform: scale(1);
         }
 
-        /* 動畫：碎片飛散並變小 */
-        @keyframes crack-explode {
-            0% {
-                transform: translate(0, 0) scale(1) rotate(0deg);
-                opacity: 1;
-            }
-            100% {
-                transform: translate(var(--dx), var(--dy)) scale(0) rotate(var(--dr));
-                opacity: 0;
-            }
+        @keyframes explode {
+            0% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 1; }
+            100% { transform: translate(var(--dx), var(--dy)) scale(0) rotate(var(--dr)); opacity: 0; }
         }
-
     </style>
 </head>
 <body>
 
-    <div class="card" id="profile-card">
-        <div class="card-content">
-            <div class="profile-header">
-                <h1>吳耀林</h1>
-                <span class="japanese-name">ゴ・ヨウリン (Go Yorin)</span>
+    <div class="card">
+        <div class="profile-pic">👋</div>
+        <h1>吳耀林</h1>
+        <div class="japanese-name">ゴ・ヨウリン (Go Yorin)</div>
+        <div class="info-section">
+            <div class="info-item">
+                <span class="label">🎂 BIRTHDAY / 誕生日</span>
+                <span class="content">2008 / 10 / 23</span>
             </div>
-
-            <div class="info-section">
-                <div class="info-item">
-                    <span class="label">🎂 BIRTHDAY / 誕生日</span>
-                    <span class="content">2008 / 10 / 23</span>
-                </div>
-
-                <div class="info-item">
-                    <span class="label">🎮 HOBBY / 趣味</span>
-                    <span class="content">玩 Minecraft <br>
-                    <span class="lang-jp">マインクラフトをすること</span></span>
-                </div>
-
-                <div class="info-item">
-                    <span class="label">🍕 FOODS / 好きな食べ物</span>
-                    <span class="content">不挑食，什麼都喜歡！<br>
-                    <span class="lang-jp">好き嫌いはありません。何でも好きです！</span></span>
-                </div>
+            <div class="info-item">
+                <span class="label">🎮 HOBBY / 趣味</span>
+                <span class="content">玩 Minecraft<br><span class="lang-jp">マインクラフトをすること</span></span>
             </div>
-
-            <div id="mine-zone-hint" class="pixel-font">
-                HINT: LONG PRESS TO MINE!<br>
-                (長按卡片來挖礦！)
+            <div class="info-item">
+                <span class="label">🍕 FOODS / 好きな食べ物</span>
+                <span class="content">不挑食，什麼都喜歡！<br><span class="lang-jp">好き嫌いはありません。何でも好きです！</span></span>
             </div>
-
-            <footer>
-                Nice to meet you!<br>
-                よろしくお願いします！
-            </footer>
         </div>
     </div>
 
+    <div id="game-layer">
+        <div id="steve-arm"></div>
+    </div>
+
+    <div style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 50;" class="hint">
+        MOVE MOUSE TO AIM,<br>
+        CLICK TO MINE!
+    </div>
+
     <script>
-        // 獲取卡片元素
-        const card = document.getElementById('profile-card');
-        let mineInterval; // 用於儲存長按時的定時器
-        let isMining = false;
+        const arm = document.getElementById('steve-arm');
+        // Minecraft 經典方塊顏色：草地綠、泥土褐、石頭灰
+        const blockColors = ['#8B5A2B', '#5DAA44', '#787878'];
 
-        // 方塊碎裂的顏色池 (泥土, 草地, 岩石)
-        const blockColors = ['#8B5A2B', '#5DAA44', '#787878', '#A9A9A9', '#4A3119'];
+        // 1. 讓手跟隨滑鼠移動
+        window.addEventListener('mousemove', (e) => {
+            // 計算滑鼠在螢幕上的水平百分比
+            const xPercent = (e.clientX / window.innerWidth) * 100;
+            // 限制手臂移動範圍 (例如從 20% 到 80%)
+            const constrainedX = Math.max(20, Math.min(80, xPercent));
+            arm.style.left = constrainedX + '%';
+        });
 
-        // 處理開始挖掘（滑鼠按下或手指觸摸）
-        function startMining(e) {
-            if (isMining) return;
-            isMining = true;
-
-            // 獲取點擊位置（相對於視窗）
-            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-
-            // 立即產生一次爆炸
-            createExplosion(clientX, clientY);
-
-            // 設置定時器，長按時持續產生碎片
-            mineInterval = setInterval(() => {
-                createExplosion(clientX, clientY);
-            }, 150); // 每 150 毫秒產生一次
-        }
-
-        // 處理停止挖掘
-        function stopMining() {
-            isMining = false;
-            clearInterval(mineInterval);
-        }
-
-        // 建立單個碎片
-        function createParticle(x, y, color) {
-            const particle = document.createElement('div');
-            particle.classList.add('crack-particle');
+        // 2. 建立碎裂碎片
+        function createParticle(x, y) {
+            const p = document.createElement('div');
+            p.classList.add('particle');
             
-            // 隨機設置碎片顏色
-            particle.style.backgroundColor = color;
+            // 隨機顏色與 Minecraft 風格的邊框
+            p.style.backgroundColor = blockColors[Math.floor(Math.random() * blockColors.length)];
+            p.style.border = '2px solid rgba(0,0,0,0.3)';
+            
+            // 碎片位置
+            p.style.left = x + 'px';
+            p.style.top = y + 'px';
 
-            // 設置初始位置（相對於 body）
-            particle.style.left = `${x - 7}px`; // 減去碎片寬度的一半
-            particle.style.top = `${y - 7}px`;
-
-            // 計算隨機飛散方向和旋轉
-            const dx = (Math.random() - 0.5) * 200; // 水平偏移 (-100 to 100)
-            const dy = (Math.random() - 0.5) * 200; // 垂直偏移
+            // 飛散動畫參數
+            const dx = (Math.random() - 0.5) * 200;
+            const dy = (Math.random() - 0.5) * 200;
             const dr = (Math.random() - 0.5) * 720; // 旋轉角度
 
-            // 將 CSS 變數傳遞給動畫
-            particle.style.setProperty('--dx', `${dx}px`);
-            particle.style.setProperty('--dy', `${dy}px`);
-            particle.style.setProperty('--dr', `${dr}deg`);
+            p.style.setProperty('--dx', `${dx}px`);
+            p.style.setProperty('--dy', `${dy}px`);
+            p.style.setProperty('--dr', `${dr}deg`);
 
-            // 套用動畫
-            particle.style.animation = 'crack-explode 0.6s ease-out forwards';
+            p.style.animation = 'explode 0.6s ease-out forwards';
 
-            document.body.appendChild(particle);
-
-            // 動畫結束後移除元素
-            particle.addEventListener('animationend', () => {
-                particle.remove();
-            });
+            document.body.appendChild(p);
+            // 動畫結束後移除
+            setTimeout(() => p.remove(), 600);
         }
 
-        // 建立一次碎片爆炸（多個碎片）
-        function createExplosion(x, y) {
-            const particleCount = 6 + Math.floor(Math.random() * 5); // 隨機產生 6-10 個碎片
-            const color = blockColors[Math.floor(Math.random() * blockColors.length)];
+        // 3. 處理點擊事件：手揮動 + 產生碎片
+        window.addEventListener('mousedown', (e) => {
+            // 只有點擊在卡片以外的地方，或是卡片上但不是文字的地方才觸發特效
+            // (防止干擾卡片內原本可能有的連結點擊)
+            if (!e.target.classList.contains('label') && !e.target.classList.contains('content')) {
+                // 手臂揮動動畫
+                arm.classList.remove('swinging');
+                void arm.offsetWidth; // 觸發 reflow 讓動畫重置
+                arm.classList.add('swinging');
 
-            for (let i = 0; i < particleCount; i++) {
-                // 讓碎片在點擊點附近有些微偏移
-                const offsetX = (Math.random() - 0.5) * 20;
-                const offsetY = (Math.random() - 0.5) * 20;
-                createParticle(x + offsetX, y + offsetY, color);
+                // 在滑鼠點擊位置產生一組碎片
+                for(let i=0; i<8; i++) {
+                    // 讓碎片中心點對準游標
+                    createParticle(e.clientX - 6, e.clientY - 6);
+                }
             }
-        }
-
-        // --- 事件監聽器 ---
-
-        // 滑鼠事件 (電腦端)
-        card.addEventListener('mousedown', startMining);
-        window.addEventListener('mouseup', stopMining); // 在視窗任何地方放開都停止
-
-        // 觸摸事件 (手機端)
-        card.addEventListener('touchstart', (e) => {
-            // 防止觸摸時捲動頁面
-            if (e.target.id === 'mine-zone-hint' || e.target.closest('#mine-zone-hint')) {
-                 // 如果點擊的是提示區，讓它保持預設行為（例如點擊效果）
-            } else {
-                e.preventDefault(); 
-            }
-            startMining(e);
-        }, { passive: false });
-        
-        window.addEventListener('touchend', stopMining);
-        window.addEventListener('touchcancel', stopMining); // 觸摸被系統中斷時也停止
+        });
 
     </script>
 </body>
