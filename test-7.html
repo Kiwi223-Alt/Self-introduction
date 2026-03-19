@@ -26,7 +26,7 @@
             overflow: hidden; 
             background: linear-gradient(to bottom, #74b9ff, #a29bfe); 
             font-family: 'Helvetica Neue', Arial, sans-serif;
-            
+            cursor: none; 
         }
 
         .pixel-font {
@@ -83,4 +83,225 @@
         .info-section { text-align: left; margin-top: 15px; color: var(--mc-ui-text-dark); }
         .info-item { margin-bottom: 12px; border-bottom: 2px solid rgba(0,0,0,0.1); padding-bottom: 8px; }
         .label { font-weight: bold; color: var(--mc-dirt); display: block; font-size: 0.75rem; text-transform: uppercase; }
-        .content { font-size: 0.95rem; margin-top: 5px; display: block;
+        .content { font-size: 0.95rem; margin-top: 5px; display: block; font-weight: 500; }
+        .content a { color: #d63031; text-decoration: none; font-weight: bold; cursor: pointer; pointer-events: auto; }
+        .content a:hover { text-decoration: underline; }
+        .lang-jp { font-size: 0.8rem; color: #555; font-style: italic; }
+
+        .message-box {
+            background-color: #E8E8E8;
+            border: 2px solid var(--mc-ui-border-dark);
+            border-right-color: var(--mc-ui-border-light);
+            border-bottom-color: var(--mc-ui-border-light);
+            padding: 12px;
+            margin-top: 15px;
+            text-align: left;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: #222;
+        }
+        .msg-lang { margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px dashed #ccc; }
+        .msg-lang:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+
+        /* 方塊牆層 */
+        #block-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: grid;
+            z-index: 10;
+            pointer-events: none; 
+        }
+
+        .block {
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            border: 1px solid rgba(0,0,0,0.1);
+            transition: opacity 0.2s, transform 0.2s;
+            image-rendering: pixelated;
+            pointer-events: auto; 
+        }
+        .broken { pointer-events: none; opacity: 0; transform: scale(0.5) rotate(20deg); }
+
+        /* 史蒂夫的手 */
+        #steve-arm {
+            position: fixed;
+            width: 70px;
+            height: 180px;
+            background-color: #A97D5D; 
+            border: 5px solid #000;
+            border-bottom: none;
+            bottom: -50px;
+            left: 50%;
+            transform: translateX(-50%) rotate(0deg);
+            transform-origin: bottom center;
+            transition: left 0.05s linear; 
+            z-index: 20; 
+            pointer-events: none; 
+        }
+        #steve-arm::after { content: ''; position: absolute; width: 40px; height: 10px; background: rgba(0,0,0,0.1); top: 60px; }
+        @keyframes swing { 0% { transform: translateX(-50%) rotate(0deg); } 50% { transform: translateX(-50%) rotate(-35deg); } 100% { transform: translateX(-50%) rotate(0deg); } }
+        .swinging { animation: swing 0.1s linear; }
+
+        /* 碎裂粒子 */
+        .particle { position: absolute; width: 12px; height: 12px; pointer-events: none; z-index: 100; }
+        @keyframes explode { 0% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 1; } 100% { transform: translate(var(--dx), var(--dy)) scale(0) rotate(var(--dr)); opacity: 0; } }
+
+        /* 提示 */
+        .hint {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 150;
+            font-size: 0.75rem;
+            color: #FFFF55;
+            text-shadow: 2px 2px 0 #000;
+            line-height: 1.6;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #555;
+            padding: 10px 20px;
+            pointer-events: none;
+            text-align: center;
+        }
+
+        /* 隱藏的驚喜視窗 (避開 adblock 敏感詞) */
+        #secret-box {
+            display: none; 
+            position: fixed; 
+            background: var(--mc-ui-bg-light);
+            border: 4px solid #333;
+            border-top-color: var(--mc-ui-border-light);
+            border-left-color: var(--mc-ui-border-light);
+            box-shadow: 10px 10px 0 rgba(0,0,0,0.5);
+            padding: 10px;
+            text-align: center;
+            z-index: 200; 
+            width: 150px;
+            pointer-events: auto; 
+            cursor: default; 
+        }
+        #secret-img { width: 130px; height: 130px; border: 2px solid #555; margin-bottom: 5px; image-rendering: pixelated; }
+        .close-btn {
+            position: absolute; top: -2px; right: -2px; padding: 4px 8px;
+            background-color: #c0392b; color: white; font-weight: bold;
+            cursor: pointer; border: 2px solid #333; font-size: 14px;
+        }
+        .close-btn:hover { background-color: #e74c3c; }
+    </style>
+</head>
+<body>
+
+    <div id="card-container">
+        <div class="card">
+            <h1 class="card-title pixel-font">吳耀林<br><span class="japanese-name pixel-font">ゴ・ヨウリン (Go Yorin)</span></h1>
+            <div class="info-section">
+                <div class="info-item"><span class="label pixel-font">🎂 Birthday</span><span class="content">2008 / 10 / 23</span></div>
+                <div class="info-item"><span class="label pixel-font">💻 Hobby</span><span class="content">寫程式、玩 Minecraft <br><span class="lang-jp">プログラミング、マイクラ</span></span></div>
+                <div class="info-item"><span class="label pixel-font">📱 Instagram</span><span class="content"><a href="https://www.instagram.com/yaoyaowu25?igsh=MXRnemg2MW9kNG9taA==" target="_blank">@yaoyaowu25</a></span></div>
+            </div>
+            <div class="message-box">
+                <div class="msg-lang"><strong>🇹🇼 中文：</strong>哈囉！我是吳耀林。很高興認識你！興趣是寫程式。希望在台灣的這段時間，我們能成為好朋友！</div>
+                <div class="msg-lang" style="color: #2e86de;"><strong>🇬🇧 English：</strong>Hello! I'm Wu, Yao-Lin. It's great to meet you! My hobby is coding. I hope we can become good friends during your time in Taiwan!</div>
+                <div class="msg-lang" style="color: #c0392b;"><strong>🇯🇵 日本語：</strong>こんにちは！吳耀林（ゴ・ヨウリン）です。はじめまして！趣味はプログラミングです。台湾にいる間、いい友達になれたら嬉しいです！</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="block-grid"></div>
+    <div id="steve-arm"></div>
+    <div class="hint pixel-font">CLICK TO BREAK BLOCKS<br>AND GET TO KNOW ME!</div>
+
+    <div id="secret-box" class="pixel-font">
+        <span class="close-btn" title="Close">X</span>
+        <img id="secret-img" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://www.instagram.com/yaoyaowu25" alt="IG">
+        <div style="font-size: 8px; color: #333; margin-top: 5px;">Scan to follow!</div>
+    </div>
+
+    <script>
+        try {
+            const grid = document.getElementById('block-grid');
+            const arm = document.getElementById('steve-arm');
+            const blockSize = 60; 
+            const secretBox = document.getElementById('secret-box');
+            const closeBtn = document.querySelector('.close-btn');
+            
+            const blockTypes = [{ top: '#5DAA44', side: '#8B5A2B' }, { top: '#8B5A2B', side: '#8B5A2B' }, { top: '#787878', side: '#787878' }];
+            const particleColors = ['#8B5A2B', '#5DAA44', '#787878', '#AAAAAA'];
+
+            function initGrid() {
+                const cols = Math.ceil(window.innerWidth / blockSize);
+                const rows = Math.ceil(window.innerHeight / blockSize);
+                grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+                grid.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+
+                for (let i = 0; i < cols * rows; i++) {
+                    const block = document.createElement('div');
+                    block.classList.add('block');
+                    let type = (i < cols * 2) ? blockTypes[0] : (i < cols * 4 ? blockTypes[Math.random() > 0.3 ? 1 : 0] : blockTypes[Math.random() > 0.3 ? 2 : 1]);
+                    block.style.backgroundColor = type.side; 
+                    block.setAttribute('data-color', type.side);
+
+                    if (type === blockTypes[0] && i < cols) {
+                        block.style.background = `linear-gradient(to bottom, ${type.top} 20%, ${type.side} 20%)`;
+                        block.setAttribute('data-color', type.top); 
+                    }
+                    grid.appendChild(block);
+                }
+            }
+
+            function createParticle(x, y, color) {
+                const p = document.createElement('div');
+                p.classList.add('particle');
+                p.style.backgroundColor = color;
+                p.style.border = '2px solid rgba(0,0,0,0.3)';
+                p.style.left = x + 'px'; p.style.top = y + 'px';
+                p.style.setProperty('--dx', `${(Math.random() - 0.5) * 200}px`);
+                p.style.setProperty('--dy', `${(Math.random() - 0.5) * 200}px`);
+                p.style.setProperty('--dr', `${(Math.random() - 0.5) * 720}deg`);
+                p.style.animation = 'explode 0.6s ease-out forwards';
+                document.body.appendChild(p);
+                setTimeout(() => p.remove(), 600);
+            }
+
+            function showSecret() {
+                secretBox.style.top = ''; secretBox.style.bottom = '';
+                secretBox.style.left = ''; secretBox.style.right = '';
+                const corner = Math.floor(Math.random() * 4);
+                const margin = '30px';
+                if (corner === 0) { secretBox.style.top = margin; secretBox.style.left = margin; }
+                else if (corner === 1) { secretBox.style.top = margin; secretBox.style.right = margin; }
+                else if (corner === 2) { secretBox.style.bottom = margin; secretBox.style.left = margin; }
+                else { secretBox.style.bottom = margin; secretBox.style.right = margin; }
+                secretBox.style.display = 'block';
+            }
+
+            window.addEventListener('mousemove', (e) => {
+                const xPercent = (e.clientX / window.innerWidth) * 100;
+                arm.style.left = Math.max(20, Math.min(80, xPercent)) + '%';
+            });
+
+            window.addEventListener('mousedown', function(e) {
+                arm.classList.remove('swinging'); void arm.offsetWidth; arm.classList.add('swinging');
+                if (e.target.classList.contains('block') && !e.target.classList.contains('broken')) {
+                    e.target.classList.add('broken');
+                    for (let i = 0; i < 8; i++) createParticle(e.clientX, e.clientY, e.target.getAttribute('data-color') || particleColors[0]);
+                } else if (e.target === document.body || e.target.id === 'card-container') {
+                    showSecret();
+                }
+            });
+
+            if (closeBtn) {
+                closeBtn.addEventListener('mousedown', (e) => { e.stopPropagation(); secretBox.style.display = 'none'; });
+            }
+            window.addEventListener('resize', () => { grid.innerHTML = ''; initGrid(); });
+            initGrid();
+        } catch (e) {
+            console.error("腳本發生錯誤:", e);
+        }
+    </script>
+</body>
+</html>
