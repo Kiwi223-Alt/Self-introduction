@@ -8,14 +8,13 @@
     <style>
         :root {
             /* 經典 Minecraft UI 顏色池 */
-            --mc-ui-bg-light: #C6C6C6; /* 面板淺灰 */
-            --mc-ui-bg-dark: #333333;  /* 面板深灰 */
-            --mc-ui-border-light: #FFFFFF; /* 面板亮邊框 */
-            --mc-ui-border-dark: #555555;  /* 面板暗邊框 */
-            --mc-ui-text-light: #FFFFFF; /* 文字白 */
-            --mc-ui-text-dark: #333333;  /* 文字暗 */
+            --mc-ui-bg-light: #C6C6C6; 
+            --mc-ui-bg-dark: #333333;  
+            --mc-ui-border-light: #FFFFFF; 
+            --mc-ui-border-dark: #555555;  
+            --mc-ui-text-light: #FFFFFF; 
+            --mc-ui-text-dark: #333333;  
             
-            /* 方塊貼圖 Base64 (避免網路資源失效，這裡用純色模擬) */
             --mc-dirt: #8B5A2B;
             --mc-grass-top: #5DAA44;
             --mc-stone: #787878;
@@ -26,50 +25,48 @@
             padding: 0;
             width: 100%;
             height: 100%;
-            overflow: hidden; /* 防止碎片產生捲軸 */
-            background-color: #333; /* 挖掘後的深淵背景 */
-            font-family: Arial, sans-serif;
-            /* 隱藏預設游標 */
-            cursor: none;
+            overflow: hidden; 
+            background-color: #333; 
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', sans-serif;
         }
 
-        /* 通用像素風字體類名 */
         .pixel-font {
             font-family: 'Press Start 2P', cursive;
             image-rendering: pixelated;
         }
 
-        /* --- 最底層：天空與你的卡片 (藏在方塊後面) --- */
+        /* --- 最底層：天空與你的卡片 --- */
         #sky-bg {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(to bottom, #74b9ff, #a29bfe); /* 天空漸層 */
+            background: linear-gradient(to bottom, #74b9ff, #a29bfe); 
             z-index: 1;
             display: flex;
             justify-content: center;
             align-items: center;
+            overflow-y: auto; /* 確保內容太多時可以滾動 */
         }
 
-        /* 自我介紹卡片 (藏在牆後面) */
+        /* 自我介紹卡片 */
         .card {
             background: var(--mc-ui-bg-light);
-            padding: 2rem;
-            border: 4px solid #333; /* 面板外層暗邊框 */
+            padding: 1.5rem;
+            border: 4px solid #333; 
             border-top-color: var(--mc-ui-border-light);
             border-left-color: var(--mc-ui-border-light);
-            box-shadow: 10px 10px 0 rgba(0,0,0,0.5); /* 立體投影 */
-            max-width: 380px;
+            box-shadow: 10px 10px 0 rgba(0,0,0,0.5); 
+            max-width: 420px;
             width: 90%;
             text-align: center;
             position: relative;
-            z-index: 2; /* 粒子和手臂下方 */
-            user-select: none;
+            z-index: 2; 
+            /* 讓卡片內容可以被選取和點擊 */
+            pointer-events: auto; 
         }
 
-        /* 卡片內層凹陷效果 */
         .card::after {
             content: '';
             position: absolute;
@@ -83,10 +80,9 @@
         h1.card-title {
             margin: 0;
             font-size: 1.2rem;
-            color: var(--mc-ui-text-dark);
-            line-height: 1.5;
-            text-shadow: 2px 2px 0 #000, 0 0 5px #000; /* 文字投影 */
             color: var(--mc-ui-text-light);
+            line-height: 1.5;
+            text-shadow: 2px 2px 0 #000, 0 0 5px #000; 
         }
 
         .japanese-name {
@@ -98,37 +94,74 @@
 
         .info-section {
             text-align: left;
-            margin-top: 25px;
+            margin-top: 15px;
             color: var(--mc-ui-text-dark);
         }
 
         .info-item {
-            margin-bottom: 20px;
-            border-bottom: 2px solid rgba(0,0,0,0.2);
-            padding-bottom: 10px;
+            margin-bottom: 12px;
+            border-bottom: 2px solid rgba(0,0,0,0.1);
+            padding-bottom: 8px;
         }
 
         .label {
             font-weight: bold;
-            color: var(--mc-dirt); /* 使用泥土色作為標籤 */
+            color: var(--mc-dirt); 
             display: block;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             text-transform: uppercase;
         }
 
         .content {
-            font-size: 1rem;
+            font-size: 0.95rem;
             margin-top: 5px;
             display: block;
+            font-weight: 500;
+        }
+
+        .content a {
+            color: #d63031;
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .content a:hover {
+            text-decoration: underline;
         }
 
         .lang-jp {
             font-size: 0.8rem;
-            color: #666;
+            color: #555;
             font-style: italic;
         }
 
-        /* --- 方塊牆層 (蓋住卡片) --- */
+        /* 新增：三語自我介紹留言板 */
+        .message-box {
+            background-color: #E8E8E8;
+            border: 2px solid var(--mc-ui-border-dark);
+            border-right-color: var(--mc-ui-border-light);
+            border-bottom-color: var(--mc-ui-border-light);
+            padding: 12px;
+            margin-top: 15px;
+            text-align: left;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: #222;
+        }
+
+        .msg-lang {
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px dashed #ccc;
+        }
+        .msg-lang:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        /* --- 方塊牆層 --- */
         #block-grid {
             position: fixed;
             top: 0;
@@ -137,7 +170,7 @@
             height: 100vh;
             display: grid;
             z-index: 10;
-            pointer-events: auto; /* 方塊需要被點擊 */
+            pointer-events: auto; 
         }
 
         .block {
@@ -145,41 +178,38 @@
             height: 100%;
             box-sizing: border-box;
             border: 1px solid rgba(0,0,0,0.1);
-            cursor: pointer;
             transition: opacity 0.2s, transform 0.2s;
             image-rendering: pixelated;
         }
 
-        /* 被破壞後的消失動畫 */
         .broken {
             pointer-events: none;
             opacity: 0;
             transform: scale(0.5) rotate(20deg);
         }
 
-        /* --- 史蒂夫的手 (最頂層游標) --- */
+        /* --- 史蒂夫的手 --- */
         #steve-arm {
             position: fixed;
             width: 70px;
             height: 180px;
-            background-color: #A97D5D; /* 皮膚色 */
+            background-color: #A97D5D; 
             border: 5px solid #000;
             border-bottom: none;
             bottom: -50px;
             left: 50%;
             transform: translateX(-50%) rotate(0deg);
             transform-origin: bottom center;
-            transition: left 0.05s linear; /* 讓移動平滑 */
+            transition: left 0.05s linear; 
             display: flex;
             justify-content: center;
             align-items: flex-start;
             padding-top: 10px;
             box-sizing: border-box;
-            z-index: 20; /* 在方塊牆之上 */
-            pointer-events: none; /* 讓點擊穿透到方塊牆 */
+            z-index: 20; 
+            pointer-events: none; 
         }
         
-        /* 手上的像素裝飾 */
         #steve-arm::after {
             content: '';
             position: absolute;
@@ -189,16 +219,12 @@
             top: 60px;
         }
 
-        /* 手揮動時的動畫 */
         @keyframes swing {
             0% { transform: translateX(-50%) rotate(0deg); }
             50% { transform: translateX(-50%) rotate(-35deg); }
             100% { transform: translateX(-50%) rotate(0deg); }
         }
-
-        .swinging {
-            animation: swing 0.1s linear;
-        }
+        .swinging { animation: swing 0.1s linear; }
 
         /* --- 碎裂粒子特效 --- */
         .particle {
@@ -206,7 +232,7 @@
             width: 12px;
             height: 12px;
             pointer-events: none;
-            z-index: 100; /* 最上方 */
+            z-index: 100; 
         }
 
         @keyframes explode {
@@ -214,22 +240,22 @@
             100% { transform: translate(var(--dx), var(--dy)) scale(0) rotate(var(--dr)); opacity: 0; }
         }
 
-        /* 下方的提示按鈕 */
         .hint {
             position: fixed;
-            bottom: 20px;
+            top: 20px; /* 從 bottom 改成 top，距離頂部 20px */
             left: 50%;
             transform: translateX(-50%);
             z-index: 50;
-            font-size: 0.65rem;
-            color: var(--mc-ui-text-light);
+            font-size: 0.75rem; /* 稍微放大一點點 */
+            color: #FFFF55; /* Minecraft 經典黃色提示字 */
             text-shadow: 2px 2px 0 #000;
             line-height: 1.6;
-            background: rgba(0,0,0,0.5);
-            padding: 10px;
-            border-radius: 5px;
+            background: rgba(0, 0, 0, 0.7); /* 半透明黑色背景，讓字更清楚 */
+            border: 2px solid #555; /* 加上像素風邊框 */
+            padding: 10px 20px;
+            pointer-events: none;
+            text-align: center;
         }
-
     </style>
 </head>
 <body>
@@ -242,24 +268,34 @@
 
             <div class="info-section">
                 <div class="info-item">
-                    <span class="label pixel-font">🎂 Birthday / 誕生日</span>
+                    <span class="label pixel-font">🎂 Birthday</span>
                     <span class="content">2008 / 10 / 23</span>
                 </div>
 
                 <div class="info-item">
-                    <span class="label pixel-font">🎮 Hobby / 趣味</span>
-                    <span class="content">玩 Minecraft <br>
-                    <span class="lang-jp">マインクラフトをすること</span></span>
+                    <span class="label pixel-font">💻 Hobby</span>
+                    <span class="content">寫程式、玩 Minecraft <br>
+                    <span class="lang-jp">プログラミング、マイクラ</span></span>
                 </div>
-
+                
                 <div class="info-item">
-                    <span class="label pixel-font">🍕 Foods / 好きな食べ物</span>
-                    <span class="content">我不挑食，什麼都喜歡！<br>
-                    <span class="lang-jp">好き嫌いはありません。何でも好きです！</span></span>
+                    <span class="label pixel-font">📱 Instagram</span>
+                    <span class="content"><a href="https://instagram.com/YAOYAOWU25" target="_blank">@YAOYAOWU25</a></span>
+                </div>
+            </div>
+
+            <div class="message-box">
+                <div class="msg-lang">
+                    <strong>🇹🇼 中文：</strong>哈囉！我是吳耀林。很高興認識你！興趣是寫程式。希望在台灣的這段時間，我們能成為好朋友！
+                </div>
+                <div class="msg-lang" style="color: #2e86de;">
+                    <strong>🇬🇧 English：</strong>Hello! I'm Wu, Yao-Lin. It's great to meet you! My hobby is coding. I hope we can become good friends during your time in Taiwan!
+                </div>
+                <div class="msg-lang" style="color: #c0392b;">
+                    <strong>🇯🇵 日本語：</strong>こんにちは！吳耀林（ゴ・ヨウリン）です。はじめまして！趣味はプログラミングです。台湾にいる間、いい友達になれたら嬉しいです！
                 </div>
             </div>
             
-            <p style="margin-top:25px; font-size:0.7rem; color:#aaa;" class="pixel-font">恭喜你挖穿了牆壁！👋<br>Nice to meet you!</p>
         </div>
     </div>
 
@@ -277,56 +313,48 @@
     <script>
         const grid = document.getElementById('block-grid');
         const arm = document.getElementById('steve-arm');
-        const blockSize = 60; // 每個方塊的大小 (像素)
+        const blockSize = 60; 
         
-        // Minecraft 方塊貼圖顏色模擬
         const blockTypes = [
-            { top: '#5DAA44', side: '#8B5A2B' }, // 草地 (地表隨機分配)
-            { top: '#8B5A2B', side: '#8B5A2B' }, // 泥土 (地表下方)
-            { top: '#787878', side: '#787878' }  // 石頭 (深層)
+            { top: '#5DAA44', side: '#8B5A2B' }, 
+            { top: '#8B5A2B', side: '#8B5A2B' }, 
+            { top: '#787878', side: '#787878' }  
         ];
 
-        // 方塊粒子顏色池
         const particleColors = ['#8B5A2B', '#5DAA44', '#787878', '#AAAAAA'];
 
         function initGrid() {
-            // 計算行列數
             const cols = Math.ceil(window.innerWidth / blockSize);
             const rows = Math.ceil(window.innerHeight / blockSize);
             
-            // 設置 Grid 排版
             grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
             grid.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
 
-            // 動態生成方塊
             for (let i = 0; i < cols * rows; i++) {
                 const block = document.createElement('div');
                 block.classList.add('block');
                 
-                // 模擬地層分層和隨機性
                 let type;
                 if (i < cols * 2) { 
-                    type = blockTypes[0]; // 頂部兩行模擬草地隨機
+                    type = blockTypes[0]; 
                 } else if (i < cols * 4) {
-                    type = blockTypes[Math.random() > 0.3 ? 1 : 0]; // 泥土和少量草地
+                    type = blockTypes[Math.random() > 0.3 ? 1 : 0]; 
                 } else {
-                    type = blockTypes[Math.random() > 0.3 ? 2 : 1]; // 石頭和泥土
+                    type = blockTypes[Math.random() > 0.3 ? 2 : 1]; 
                 }
 
-                block.style.backgroundColor = type.side; // 預設使用側面顏色
+                block.style.backgroundColor = type.side; 
                 block.setAttribute('data-color', type.side);
 
-                // 只有最上層方塊有草地貼圖
                 if (type === blockTypes[0] && i < cols) {
                     block.style.background = `linear-gradient(to bottom, ${type.top} 20%, ${type.side} 20%)`;
-                    block.setAttribute('data-color', type.top); // 使用頂部顏色作為粒子顏色
+                    block.setAttribute('data-color', type.top); 
                 }
 
                 grid.appendChild(block);
             }
         }
 
-        // 建立單個碎裂碎片
         function createParticle(x, y, color) {
             const p = document.createElement('div');
             p.classList.add('particle');
@@ -337,7 +365,7 @@
             
             const dx = (Math.random() - 0.5) * 200;
             const dy = (Math.random() - 0.5) * 200;
-            const dr = (Math.random() - 0.5) * 720; // 旋轉角度
+            const dr = (Math.random() - 0.5) * 720; 
 
             p.style.setProperty('--dx', `${dx}px`);
             p.style.setProperty('--dy', `${dy}px`);
@@ -348,49 +376,38 @@
             setTimeout(() => p.remove(), 600);
         }
 
-        // 破壞方塊邏輯
         function breakBlock(el, x, y, color) {
             el.classList.add('broken');
-            
-            // 產生一組碎裂粒子
             for (let i = 0; i < 8; i++) {
                 createParticle(x, y, color);
             }
         }
 
-        // --- 互動事件監聽 ---
-
-        // 1. 手臂跟隨滑鼠移動
         window.addEventListener('mousemove', (e) => {
             const xPercent = (e.clientX / window.innerWidth) * 100;
-            // 限制移動範圍避免超出螢幕太多
             const constrainedX = Math.max(20, Math.min(80, xPercent));
             arm.style.left = constrainedX + '%';
         });
 
-        // 2. 點擊互動：手臂擺動 + 破壞方塊
-        grid.addEventListener('mousedown', function(e) {
-            const clickedEl = e.target;
-            
-            if (clickedEl.classList.contains('block') && !clickedEl.classList.contains('broken')) {
-                // 手臂擺動動畫
-                arm.classList.remove('swinging');
-                void arm.offsetWidth; // 觸發 reflow 讓動畫重置
-                arm.classList.add('swinging');
+        // 監聽點擊事件
+        window.addEventListener('mousedown', function(e) {
+            // 處理挖掘動畫
+            arm.classList.remove('swinging');
+            void arm.offsetWidth; 
+            arm.classList.add('swinging');
 
-                // 破壞點擊的方塊
-                const color = clickedEl.getAttribute('data-color') || particleColors[0];
-                breakBlock(clickedEl, e.clientX, e.clientY, color);
+            // 如果點擊的是方塊，則破壞它
+            if (e.target.classList.contains('block') && !e.target.classList.contains('broken')) {
+                const color = e.target.getAttribute('data-color') || particleColors[0];
+                breakBlock(e.target, e.clientX, e.clientY, color);
             }
         });
 
-        // 視窗縮放時重新生成網格
         window.addEventListener('resize', () => {
             grid.innerHTML = '';
             initGrid();
         });
 
-        // 初始化
         initGrid();
     </script>
 </body>
