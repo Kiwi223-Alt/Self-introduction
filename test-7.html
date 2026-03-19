@@ -36,7 +36,7 @@
             image-rendering: pixelated;
         }
 
-        /* --- 最底層：天空與你的卡片 --- */
+        /* --- 最底層：天空層 (點擊會觸發 QR Code) --- */
         #sky-bg {
             position: fixed;
             top: 0;
@@ -48,7 +48,8 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow-y: auto; /* 確保內容太多時可以滾動 */
+            overflow-y: auto; 
+            pointer-events: auto; /* 確保能點擊到天空層 */
         }
 
         /* 自我介紹卡片 */
@@ -63,7 +64,7 @@
             width: 90%;
             text-align: center;
             position: relative;
-            z-index: 2; 
+            z-index: 2; /* 粒子和手臂下方 */
             /* 讓卡片內容可以被選取和點擊 */
             pointer-events: auto; 
         }
@@ -137,7 +138,6 @@
             font-style: italic;
         }
 
-        /* 新增：三語自我介紹留言板 */
         .message-box {
             background-color: #E8E8E8;
             border: 2px solid var(--mc-ui-border-dark);
@@ -162,7 +162,7 @@
             border-bottom: none;
         }
 
-        /* --- 方塊牆層 --- */
+        /* --- 方塊牆層 (蓋住天空) --- */
         #block-grid {
             position: fixed;
             top: 0;
@@ -171,7 +171,7 @@
             height: 100vh;
             display: grid;
             z-index: 10;
-            pointer-events: auto; 
+            pointer-events: auto; /* 方塊需要被點擊 */
         }
 
         .block {
@@ -183,32 +183,33 @@
             image-rendering: pixelated;
         }
 
+        /* 被破壞後的消失動畫 */
         .broken {
             pointer-events: none;
             opacity: 0;
             transform: scale(0.5) rotate(20deg);
         }
 
-        /* --- 史蒂夫的手 --- */
+        /* --- 史蒂夫的手 (游標) --- */
         #steve-arm {
             position: fixed;
             width: 70px;
             height: 180px;
-            background-color: #A97D5D; 
+            background-color: #A97D5D; /* 皮膚色 */
             border: 5px solid #000;
             border-bottom: none;
             bottom: -50px;
             left: 50%;
             transform: translateX(-50%) rotate(0deg);
             transform-origin: bottom center;
-            transition: left 0.05s linear; 
+            transition: left 0.05s linear; /* 讓移動平滑 */
             display: flex;
             justify-content: center;
             align-items: flex-start;
             padding-top: 10px;
             box-sizing: border-box;
-            z-index: 20; 
-            pointer-events: none; 
+            z-index: 20; /* 在方塊牆之上 */
+            pointer-events: none; /* 讓點擊穿透到方塊牆 */
         }
         
         #steve-arm::after {
@@ -220,6 +221,7 @@
             top: 60px;
         }
 
+        /* 手揮動時的動畫 */
         @keyframes swing {
             0% { transform: translateX(-50%) rotate(0deg); }
             50% { transform: translateX(-50%) rotate(-35deg); }
@@ -233,7 +235,7 @@
             width: 12px;
             height: 12px;
             pointer-events: none;
-            z-index: 100; 
+            z-index: 100; /* 最上方 */
         }
 
         @keyframes explode {
@@ -241,21 +243,65 @@
             100% { transform: translate(var(--dx), var(--dy)) scale(0) rotate(var(--dr)); opacity: 0; }
         }
 
+        /* 置頂提示 */
         .hint {
             position: fixed;
-            bottom: 20px;
+            top: 20px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 50;
-            font-size: 0.65rem;
-            color: var(--mc-ui-text-light);
+            font-size: 0.75rem;
+            color: #FFFF55;
             text-shadow: 2px 2px 0 #000;
             line-height: 1.6;
-            background: rgba(0,0,0,0.5);
-            padding: 10px;
-            border-radius: 5px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #555;
+            padding: 10px 20px;
             pointer-events: none;
+            text-align: center;
         }
+
+        /* IG QR Code 彩蛋容器 */
+        #qr-container {
+            display: none; /* 預設隱藏 */
+            position: fixed;
+            background: var(--mc-ui-bg-light);
+            border: 4px solid #333;
+            border-top-color: var(--mc-ui-border-light);
+            border-left-color: var(--mc-ui-border-light);
+            box-shadow: 10px 10px 0 rgba(0,0,0,0.5);
+            padding: 10px;
+            text-align: center;
+            z-index: 100; /* 顯示在最上方 */
+            width: 170px;
+            pointer-events: auto; /* 允許點擊關閉按鈕 */
+            cursor: default; /* 讓這裡看起來像正常游標區 */
+        }
+
+        /* 二維碼圖片 */
+        #qr-image {
+            width: 150px;
+            height: 150px;
+            border: 2px solid #555;
+            margin-bottom: 5px;
+            image-rendering: pixelated;
+        }
+
+        /* 關閉按鈕 (像素風格) */
+        .close-qr {
+            position: absolute;
+            top: 0px;
+            right: 0px;
+            padding: 2px 5px;
+            background-color: #c0392b;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            border: 2px solid #555;
+            font-size: 14px;
+        }
+        .close-qr:hover { background-color: #e74c3c; }
+
     </style>
 </head>
 <body>
@@ -280,7 +326,7 @@
                 
                 <div class="info-item">
                     <span class="label pixel-font">📱 Instagram</span>
-                    <span class="content"><a href="https://instagram.com/YAOYAOWU25" target="_blank">@YAOYAOWU25</a></span>
+                    <span class="content"><a href="https://www.instagram.com/yaoyaowu25?igsh=MXRnemg2MW9kNG9taA==" target="_blank">@yaoyaowu25</a></span>
                 </div>
             </div>
 
@@ -306,109 +352,9 @@
     </div>
 
     <div class="hint pixel-font">
-        MOVE MOUSE TO AIM,<br>
-        CLICK TO MINE!
+        CLICK TO BREAK BLOCKS<br>
+        AND GET TO KNOW ME!
     </div>
 
-    <script>
-        const grid = document.getElementById('block-grid');
-        const arm = document.getElementById('steve-arm');
-        const blockSize = 60; 
-        
-        const blockTypes = [
-            { top: '#5DAA44', side: '#8B5A2B' }, 
-            { top: '#8B5A2B', side: '#8B5A2B' }, 
-            { top: '#787878', side: '#787878' }  
-        ];
-
-        const particleColors = ['#8B5A2B', '#5DAA44', '#787878', '#AAAAAA'];
-
-        function initGrid() {
-            const cols = Math.ceil(window.innerWidth / blockSize);
-            const rows = Math.ceil(window.innerHeight / blockSize);
-            
-            grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-            grid.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
-
-            for (let i = 0; i < cols * rows; i++) {
-                const block = document.createElement('div');
-                block.classList.add('block');
-                
-                let type;
-                if (i < cols * 2) { 
-                    type = blockTypes[0]; 
-                } else if (i < cols * 4) {
-                    type = blockTypes[Math.random() > 0.3 ? 1 : 0]; 
-                } else {
-                    type = blockTypes[Math.random() > 0.3 ? 2 : 1]; 
-                }
-
-                block.style.backgroundColor = type.side; 
-                block.setAttribute('data-color', type.side);
-
-                if (type === blockTypes[0] && i < cols) {
-                    block.style.background = `linear-gradient(to bottom, ${type.top} 20%, ${type.side} 20%)`;
-                    block.setAttribute('data-color', type.top); 
-                }
-
-                grid.appendChild(block);
-            }
-        }
-
-        function createParticle(x, y, color) {
-            const p = document.createElement('div');
-            p.classList.add('particle');
-            p.style.backgroundColor = color;
-            p.style.border = '2px solid rgba(0,0,0,0.3)';
-            p.style.left = x + 'px';
-            p.style.top = y + 'px';
-            
-            const dx = (Math.random() - 0.5) * 200;
-            const dy = (Math.random() - 0.5) * 200;
-            const dr = (Math.random() - 0.5) * 720; 
-
-            p.style.setProperty('--dx', `${dx}px`);
-            p.style.setProperty('--dy', `${dy}px`);
-            p.style.setProperty('--dr', `${dr}deg`);
-            p.style.animation = 'explode 0.6s ease-out forwards';
-            
-            document.body.appendChild(p);
-            setTimeout(() => p.remove(), 600);
-        }
-
-        function breakBlock(el, x, y, color) {
-            el.classList.add('broken');
-            for (let i = 0; i < 8; i++) {
-                createParticle(x, y, color);
-            }
-        }
-
-        window.addEventListener('mousemove', (e) => {
-            const xPercent = (e.clientX / window.innerWidth) * 100;
-            const constrainedX = Math.max(20, Math.min(80, xPercent));
-            arm.style.left = constrainedX + '%';
-        });
-
-        // 監聽點擊事件
-        window.addEventListener('mousedown', function(e) {
-            // 處理挖掘動畫
-            arm.classList.remove('swinging');
-            void arm.offsetWidth; 
-            arm.classList.add('swinging');
-
-            // 如果點擊的是方塊，則破壞它
-            if (e.target.classList.contains('block') && !e.target.classList.contains('broken')) {
-                const color = e.target.getAttribute('data-color') || particleColors[0];
-                breakBlock(e.target, e.clientX, e.clientY, color);
-            }
-        });
-
-        window.addEventListener('resize', () => {
-            grid.innerHTML = '';
-            initGrid();
-        });
-
-        initGrid();
-    </script>
-</body>
-</html>
+    <div id="qr-container" class="pixel-font">
+        <span class
